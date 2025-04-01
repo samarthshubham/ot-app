@@ -16,7 +16,9 @@ export class AuthService {
   }
 
   async generateToken(user: any) {
-    return this.jwtService.sign({ username: user.username, sub: user.id });
+    const payload = { username: user.username, sub: user.id };
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 
   async signup(username: string, password: string) {
@@ -36,6 +38,8 @@ export class AuthService {
     if (!user || !(await this.validatePassword(password, user.password))) {
       throw new Error('Invalid credentials');
     }
-    return { access_token: this.generateToken(user) };
+
+    const token = await this.generateToken(user);
+    return { access_token: token };
   }
 }
