@@ -43,3 +43,17 @@ button:disabled {
   text-align: center;
   margin-top: 10px;
 }
+
+.signup-link {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.signup-link a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
