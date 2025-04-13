@@ -85,5 +85,8 @@
   },
   "nx": {
     "includedScripts": []
+  },
+  "prisma": {
+    "schema": "apps/backend/prisma/schema.prisma"
   }
 }
