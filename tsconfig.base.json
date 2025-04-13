@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@ot-demo/libs/login": ["libs/login/src/index.ts"]
+      "@ot-demo/libs/login": ["libs/login/src/index.ts"],
+      "@ot-demo/libs/services/auth": ["libs/services/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
