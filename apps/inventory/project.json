@@ -22,7 +22,10 @@
             "input": "apps/inventory/public"
           }
         ],
-        "styles": ["apps/inventory/src/styles.scss"],
+        "styles": [
+          "libs/shared-styles/theme.scss",
+          "apps/inventory/src/styles.scss"
+        ],
         "scripts": []
       },
       "configurations": {

@@ -1,0 +1,28 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+$primary: mat.$azure-palette;
+$accent: mat.$rose-palette;
+$warn: mat.$red-palette;
+
+$theme: mat.define-theme(
+  (
+    color: (
+      theme-type: light,
+      primary: $primary,
+      tertiary: $accent,
+    ),
+    typography: (
+      brand-family: (
+        Roboto,
+        'Helvetica Neue',
+        sans-serif,
+      ),
+    ),
+  )
+);
+
+:root {
+  // Apply theme to all @angular/material components
+  @include mat.all-component-themes($theme);
+}

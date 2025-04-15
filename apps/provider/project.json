@@ -22,7 +22,10 @@
             "input": "apps/provider/public"
           }
         ],
-        "styles": ["apps/provider/src/styles.scss"],
+        "styles": [
+          "libs/shared-styles/theme.scss",
+          "apps/provider/src/styles.scss"
+        ],
         "scripts": []
       },
       "configurations": {
