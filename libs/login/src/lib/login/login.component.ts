@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService, Login } from '@ot-demo/libs/services/auth';
 
 @Component({
@@ -20,8 +20,9 @@ export class LoginComponent {
   errorMessage = '';
 
   constructor(
-    private authService: AuthService,
-    private formbuilder: FormBuilder
+    private readonly authService: AuthService,
+    private readonly formbuilder: FormBuilder,
+    private readonly router: Router
   ) {
     this.loginForm = this.formbuilder.group({
       username: ['', [Validators.required]],
@@ -39,6 +40,8 @@ export class LoginComponent {
     this.authService.login(loginData).subscribe({
       next: (response) => {
         console.log('Logged in successfully!', response);
+        sessionStorage.setItem('authToken', response.access_token);
+        this.router.navigate(['/dashboard']);
       },
       error: (err) => {
         console.error('Login failed', err);

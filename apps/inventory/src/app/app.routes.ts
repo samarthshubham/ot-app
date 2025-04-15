@@ -1,20 +1,10 @@
-import { Route } from '@angular/router';
+import { Routes } from '@angular/router';
 import { LoginComponent } from '@ot-demo/libs/login';
 import { SignupComponent } from '@ot-demo/libs/signup';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
-export const appRoutes: Route[] = [
-  {
-    path: 'login',
-    component: LoginComponent,
-  },
-  {
-    path: 'signup',
-    component: SignupComponent,
-  },
-  // You can add more routes as needed
-  {
-    path: '',
-    redirectTo: '/login',
-    pathMatch: 'full',
-  },
+export const appRoutes: Routes = [
+  { path: '', component: LoginComponent },
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'signup', component: SignupComponent },
 ];
