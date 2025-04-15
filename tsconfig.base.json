@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@ot-app/user-identity": ["libs/user-identity/src/index.ts"],
       "@ot-demo/libs/login": ["libs/login/src/index.ts"],
       "@ot-demo/libs/services/auth": ["libs/services/src/index.ts"],
       "@ot-demo/libs/signup": ["libs/signup/src/index.ts"]
