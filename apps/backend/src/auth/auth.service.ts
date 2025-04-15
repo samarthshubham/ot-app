@@ -29,6 +29,7 @@ export class AuthService {
         password: hashedPassword,
         name: 'Default Name',
         email: `${username}@example.com`,
+        role: 'User', // Adding default role
       },
     });
   }

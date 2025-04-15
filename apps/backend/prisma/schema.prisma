@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,9 +11,243 @@ datasource db {
 }
 
 model User {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  name  String
-  email String @unique
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String @unique
   username String @unique
   password String
+  role     String // Admin, Inventory Manager, Provider (Doctor/Nurse), etc.
+  provider Provider?
+}
+
+// Inventory App Models
+
+model InventoryItem {
+  id              String            @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String?
+  type            String            // Equipment, Medicine, Disposable, Instrument, etc.
+  quantity        Int               // Current quantity in stock
+  unitPrice       Float
+  minimumQuantity Int               // Threshold for reordering
+  expiryDate      DateTime?         // For medicines and some disposables
+  categoryId      String            @db.ObjectId
+  supplierId      String?           @db.ObjectId
+  serialNumber    String?           // For equipment tracking
+  location        String?           // Storage location in the hospital
+  status          String            // Available, Low Stock, Out of Stock, Expired
+  isConsumable    Boolean           // Whether the item is consumed during use
+  transactions    ItemTransaction[]
+  category        Category          @relation(fields: [categoryId], references: [id])
+  supplier        Supplier?         @relation(fields: [supplierId], references: [id])
+  usageHistory    UsageHistory[]
+  requests        ItemRequest[]
+  surgicalKits    KitItem[]
+}
+
+model Category {
+  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  description  String?
+  inventoryItems InventoryItem[]
+}
+
+model Supplier {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  contactPerson String?
+  email         String?
+  phone         String?
+  address       String?
+  inventoryItems InventoryItem[]
+  purchaseOrders PurchaseOrder[]
+}
+
+model PurchaseOrder {
+  id            String          @id @default(auto()) @map("_id") @db.ObjectId
+  orderNumber   String          @unique
+  supplierId    String          @db.ObjectId
+  orderDate     DateTime
+  expectedDelivery DateTime?
+  status        String          // Pending, Delivered, Cancelled, Partially Delivered
+  totalAmount   Float
+  notes         String?
+  createdBy     String          // User ID who created the order
+  supplier      Supplier        @relation(fields: [supplierId], references: [id])
+  items         OrderItem[]
+}
+
+model OrderItem {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  purchaseOrderId String        @db.ObjectId
+  itemName        String
+  description     String?
+  quantity        Int
+  unitPrice       Float
+  totalPrice      Float
+  receivedQuantity Int?
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+}
+
+model ItemTransaction {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  itemId          String        @db.ObjectId
+  transactionType String        // Received, Issued, Returned, Disposed, Adjusted
+  quantity        Int
+  date            DateTime
+  operationId     String?       @db.ObjectId // If transaction is related to an operation
+  providerId      String?       @db.ObjectId // Provider who requested/received the item
+  notes           String?
+  inventoryItem   InventoryItem @relation(fields: [itemId], references: [id])
+  provider        Provider?     @relation(fields: [providerId], references: [id])
+  operation       Operation?    @relation(fields: [operationId], references: [id])
+}
+
+model SurgicalKit {
+  id             String    @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  description    String?
+  forSurgeryType String?   // Type of surgery this kit is designed for
+  items          KitItem[]
+  operations     OperationToKit[] // Fixed many-to-many relation
+}
+
+model KitItem {
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
+  kitId         String       @db.ObjectId
+  itemId        String       @db.ObjectId
+  quantity      Int
+  isRequired    Boolean      // Whether this item is mandatory for the kit
+  surgicalKit   SurgicalKit  @relation(fields: [kitId], references: [id])
+  inventoryItem InventoryItem @relation(fields: [itemId], references: [id])
+}
+
+// Provider App Models
+
+model Provider {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String          @unique @db.ObjectId
+  type            String          // Doctor, Nurse, Anesthetist, OT Technician, etc.
+  specialization  String?         // Cardiology, Orthopedics, etc. for doctors
+  licenseNumber   String?
+  department      String?
+  contactInfo     String?
+  user            User            @relation(fields: [userId], references: [id])
+  operations      Operation[]     // Operations performed/assisted by this provider
+  itemRequests    ItemRequest[]   // Inventory items requested by this provider
+  transactions    ItemTransaction[] // Inventory transactions associated with this provider
+  usageHistory    UsageHistory[]  // History of item usage by this provider
+  teamAssignments OperationTeam[] // Added the opposite relation field
+}
+
+model Patient {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  age             Int
+  gender          String
+  bloodGroup      String?
+  contactInfo     String?
+  address         String?
+  medicalHistory  String?
+  operations      Operation[] // Operations performed on this patient
+}
+
+model OperationType {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  description     String?
+  estimatedDuration Int?      // Estimated duration in minutes
+  requiredItems   String?     // Description of items typically required
+  operations      Operation[]
+}
+
+model OperationTheater {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  floor           String?
+  building        String?
+  status          String      // Available, Occupied, Under Maintenance
+  capacity        Int?
+  equipmentNotes  String?     // Notes about fixed equipment in this theater
+  operations      Operation[]
+}
+
+model Operation {
+  id                String            @id @default(auto()) @map("_id") @db.ObjectId
+  operationNumber   String            @unique
+  operationDate     DateTime
+  status            String            // Scheduled, In Progress, Completed, Cancelled
+  typeId            String            @db.ObjectId
+  patientId         String            @db.ObjectId
+  primaryProviderId String            @db.ObjectId // Primary doctor/surgeon
+  theaterId         String?           @db.ObjectId
+  notes             String?
+  duration          Int?              // Duration in minutes
+  startTime         DateTime?
+  endTime           DateTime?
+  operationType     OperationType     @relation(fields: [typeId], references: [id])
+  patient           Patient           @relation(fields: [patientId], references: [id])
+  primaryProvider   Provider          @relation(fields: [primaryProviderId], references: [id])
+  theater           OperationTheater? @relation(fields: [theaterId], references: [id])
+  teamMembers       OperationTeam[]
+  itemsUsed         UsageHistory[]
+  itemRequests      ItemRequest[]
+  kitsUsed          OperationToKit[]  // Fixed many-to-many relation
+  transactions      ItemTransaction[] // Inventory transactions related to this operation
+}
+
+// This model represents the many-to-many relationship between Operation and SurgicalKit
+model OperationToKit {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  operationId   String      @db.ObjectId
+  kitId         String      @db.ObjectId
+  operation     Operation   @relation(fields: [operationId], references: [id])
+  surgicalKit   SurgicalKit @relation(fields: [kitId], references: [id])
+  notes         String?
+  assignedDate  DateTime    @default(now())
+}
+
+model OperationTeam {
+  id              String      @id @default(auto()) @map("_id") @db.ObjectId
+  operationId     String      @db.ObjectId
+  providerId      String      @db.ObjectId
+  role            String      // Surgeon, Assistant, Anesthetist, Nurse, etc.
+  notes           String?
+  operation       Operation   @relation(fields: [operationId], references: [id])
+  provider        Provider    @relation(fields: [providerId], references: [id])
+
+  @@unique([operationId, providerId, role])
+}
+
+// Models connecting Inventory and Provider apps
+
+model ItemRequest {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  requestNumber   String        @unique
+  itemId          String        @db.ObjectId
+  requestedBy     String        @db.ObjectId // Provider ID
+  operationId     String?       @db.ObjectId // If request is for a specific operation
+  quantity        Int
+  urgency         String        // Normal, Urgent, Emergency
+  status          String        // Pending, Approved, Rejected, Fulfilled, Partially Fulfilled
+  requestDate     DateTime
+  approvedBy      String?       // User ID who approved the request
+  fulfilledDate   DateTime?
+  notes           String?
+  inventoryItem   InventoryItem @relation(fields: [itemId], references: [id])
+  provider        Provider      @relation(fields: [requestedBy], references: [id])
+  operation       Operation?    @relation(fields: [operationId], references: [id])
+}
+
+model UsageHistory {
+  id              String        @id @default(auto()) @map("_id") @db.ObjectId
+  itemId          String        @db.ObjectId
+  providerId      String        @db.ObjectId
+  operationId     String        @db.ObjectId
+  quantity        Int
+  usageDate       DateTime
+  notes           String?
+  inventoryItem   InventoryItem @relation(fields: [itemId], references: [id])
+  provider        Provider      @relation(fields: [providerId], references: [id])
+  operation       Operation     @relation(fields: [operationId], references: [id])
 }
