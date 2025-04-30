@@ -2,10 +2,11 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserIdentityComponent } from '@ot-app/user-identity';
 import { jwtDecode } from 'jwt-decode';
+import { InventoryListComponent } from '../../inventory-item/components/inventory-list/inventory-list.component';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule, UserIdentityComponent],
+  imports: [CommonModule, UserIdentityComponent, InventoryListComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })

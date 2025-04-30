@@ -1,0 +1,50 @@
+<div class="inventory-list-container">
+  <h2 class="inventory-title">Inventory Items</h2>
+
+  <div class="list-header">
+    <span class="name">Name</span>
+    <span class="quantity">Qty</span>
+    <span class="status">Status</span>
+  </div>
+
+  <div class="inventory-items">
+    <div
+      class="inventory-item"
+      *ngFor="let item of inventoryItems"
+      [ngClass]="getStatusClass(item)"
+    >
+      <div class="item-main">
+        <div class="name-type">
+          <span class="name">{{ item.name }}</span>
+          <span class="type">{{ item.type }}</span>
+        </div>
+        <div class="quantity">{{ item.quantity }}</div>
+        <div class="status-badge" [ngClass]="getStatusClass(item)">
+          {{ item.status }}
+        </div>
+      </div>
+
+      <div class="item-details">
+        <p class="description">{{ item.description }}</p>
+        <div class="location-price">
+          <div class="location">
+            <span class="icon">📍</span>
+            <span>{{ item.location }}</span>
+          </div>
+          <div class="price">
+            <span class="icon">💲</span>
+            <span>{{ item.unitPrice | currency }}</span>
+          </div>
+        </div>
+        <div class="supplier">
+          <span class="icon">🏭</span>
+          <span>{{ item.supplierName }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="inventoryItems.length === 0" class="no-items">
+      <p>No inventory items available.</p>
+    </div>
+  </div>
+</div>

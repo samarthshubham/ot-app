@@ -1,9 +1,38 @@
 /* You can add global styles to this file, and also import other style files */
-// body {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   min-height: 100vh;
-//   margin: 0;
-//   background-color: #eef1f5;
-// }
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+
+/* Global styles and resets */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+body {
+  background-color: #f5f7fa;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+/* Global utility classes */
+.full-width {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Status color utilities */
+.status-available {
+  color: #155724;
+}
+
+.status-low-stock {
+  color: #856404;
+}
+
+.status-out-of-stock,
+.status-expired {
+  color: #721c24;
+}

@@ -1,4 +1,9 @@
-<div class="header">
-  <lib-user-identity [userName]="username"></lib-user-identity>
+<div class="dashboard-container">
+  <div class="header">
+    <lib-user-identity [userName]="username"></lib-user-identity>
+  </div>
+
+  <div class="dashboard-content">
+    <app-inventory-list></app-inventory-list>
+  </div>
 </div>
-<p>dashboard works!</p>

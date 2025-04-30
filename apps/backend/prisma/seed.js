@@ -1,13 +1,8 @@
 // Create a CommonJS version of the seed file
 require('dotenv').config({ path: './apps/backend/.env' });
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
-
-async function hashPassword(password) {
-    return bcrypt.hash(password, 10);
-}
 
 async function main() {
     console.log('Starting database seeding...');
@@ -37,16 +32,13 @@ async function main() {
 
     console.log('Database cleared successfully. Starting to seed new data...');
 
-    // Hash the password at runtime
-    const hashedPassword = await hashPassword('password');
-
     // Create Users with role included
     const adminUser = await prisma.user.create({
         data: {
             name: 'Admin User',
             email: 'admin@ot-app.com',
             username: 'admin',
-            password: hashedPassword, // Freshly hashed password
+            password: '$2a$10$LrOfPFYlY0s.wH9aB/3dUe9U7vISROzZtoql0RiIMqVX/FmZ.DZ2q', // "password" hashed
             role: 'Admin',
         },
     });
@@ -56,7 +48,7 @@ async function main() {
             name: 'Inventory Manager',
             email: 'inventory@ot-app.com',
             username: 'inventory',
-            password: hashedPassword, // Freshly hashed password
+            password: '$2a$10$LrOfPFYlY0s.wH9aB/3dUe9U7vISROzZtoql0RiIMqVX/FmZ.DZ2q', // "password" hashed
             role: 'Inventory Manager',
         },
     });
@@ -66,7 +58,7 @@ async function main() {
             name: 'Dr. John Smith',
             email: 'john.smith@ot-app.com',
             username: 'dr.smith',
-            password: hashedPassword, // Freshly hashed password
+            password: '$2a$10$LrOfPFYlY0s.wH9aB/3dUe9U7vISROzZtoql0RiIMqVX/FmZ.DZ2q', // "password" hashed
             role: 'Provider',
         },
     });
@@ -76,7 +68,7 @@ async function main() {
             name: 'Nurse Sarah Johnson',
             email: 'sarah.johnson@ot-app.com',
             username: 'nurse.sarah',
-            password: hashedPassword, // Freshly hashed password
+            password: '$2a$10$LrOfPFYlY0s.wH9aB/3dUe9U7vISROzZtoql0RiIMqVX/FmZ.DZ2q', // "password" hashed
             role: 'Provider',
         },
     });
